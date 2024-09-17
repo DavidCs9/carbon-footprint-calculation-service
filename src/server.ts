@@ -226,6 +226,10 @@ app.post(
       const carbonFootprint = calculateTotalCarbonFootprint(data);
       const aiAnalysis = await getAIAnalysis(carbonFootprint, data);
       const calculationId = uuidv4();
+      const averages = {
+        global: 4000, // 4 tons in kg
+        us: 16000, // 16 tons in kg
+      };
 
       const params = {
         TableName: "ecoviz",
@@ -235,6 +239,7 @@ app.post(
           carbonFootprint,
           calculationData: data,
           aiAnalysis,
+          averages,
           timestamp: new Date().toISOString(),
         },
       };
@@ -245,6 +250,7 @@ app.post(
         calculationId,
         carbonFootprint,
         aiAnalysis,
+        averages,
         message:
           "Carbon footprint calculation and AI analysis stored successfully",
       });
