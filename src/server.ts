@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ AWS.config.update({
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 interface CalculationData {
   electricity: number;
