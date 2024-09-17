@@ -22,3 +22,7 @@ aws ecr-public get-login-password --region us-east-1 | docker login --username A
 
 build and push
 docker buildx build --platform linux/amd64,linux/arm64 -t public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch --push .
+
+ec2 commands
+pull latest image
+docker pull public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch
