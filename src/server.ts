@@ -161,32 +161,65 @@ async function getAIAnalysis(
   carbonFootprint: number,
   data: CalculationData
 ): Promise<string> {
-  const prompt = `
-    Analyze the following carbon footprint data and provide personalized recommendations:
-    - Total carbon footprint: ${carbonFootprint.toFixed(2)} kg CO2e per year
-    - Housing: ${data.housing.type}, Household size: ${data.housing.size}
-    - Electricity usage: ${data.housing.energy.electricity} kWh per year
-    - Natural gas usage: ${data.housing.energy.naturalGas} therms per year
-    - Heating oil usage: ${data.housing.energy.heatingOil} gallons per year
-    - Car usage: ${
-      data.transportation.car.milesDriven
-    } miles per year, Fuel efficiency: ${
-    data.transportation.car.fuelEfficiency
-  } mpg
-    - Public transit: ${
-      data.transportation.publicTransit.busMiles
-    } bus miles, ${
-    data.transportation.publicTransit.trainMiles
-  } train miles per year
-    - Flights: ${data.transportation.flights.shortHaul} short-haul, ${
-    data.transportation.flights.longHaul
-  } long-haul per year
-    - Diet type: ${data.food.dietType}
-    - Food waste level: ${data.food.wasteLevel}
-    - Shopping habits: ${data.consumption.shoppingHabits}
-    - Recycling habits: ${data.consumption.recyclingHabits}
+  // Calculate percentage contributions (simplified)
+  const totalEmissions = carbonFootprint;
+  const housingEmissions =
+    data.housing.energy.electricity * 0.4 +
+    data.housing.energy.naturalGas * 5.3;
+  const transportEmissions =
+    data.transportation.car.milesDriven * 0.404 +
+    (data.transportation.flights.shortHaul +
+      data.transportation.flights.longHaul) *
+      1000;
+  const foodEmissions =
+    data.food.dietType === "meat-heavy"
+      ? 3000
+      : data.food.dietType === "vegetarian"
+      ? 1400
+      : 2000;
 
-    Please provide 3 specific recommendations to reduce the carbon footprint based on this data.
+  const housingPercentage = (housingEmissions / totalEmissions) * 100;
+  const transportPercentage = (transportEmissions / totalEmissions) * 100;
+  const foodPercentage = (foodEmissions / totalEmissions) * 100;
+
+  // Identify top two contributors
+  const contributors = [
+    { name: "Housing", value: housingPercentage },
+    { name: "Transportation", value: transportPercentage },
+    { name: "Food", value: foodPercentage },
+  ]
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 2);
+
+  const prompt = `
+    Analyze this user's carbon footprint (${carbonFootprint.toFixed(
+      2
+    )} kg CO2e/year):
+    1. Housing (${housingPercentage.toFixed(1)}%): ${data.housing.type}, ${
+    data.housing.size
+  } people, ${data.housing.energy.electricity} kWh electricity, ${
+    data.housing.energy.naturalGas
+  } therms gas
+    2. Transportation (${transportPercentage.toFixed(1)}%): ${
+    data.transportation.car.milesDriven
+  } miles driven, ${
+    data.transportation.flights.shortHaul + data.transportation.flights.longHaul
+  } flights/year
+    3. Food (${foodPercentage.toFixed(1)}%): ${
+    data.food.dietType
+  } diet, Waste level: ${data.food.wasteLevel}
+    4. Consumption: Shopping habits ${
+      data.consumption.shoppingHabits
+    }, Recycling habits ${data.consumption.recyclingHabits}
+
+    Top contributors: ${contributors[0].name} and ${contributors[1].name}
+
+    Provide 3 specific, actionable recommendations to reduce this carbon footprint, focusing on the top contributors. For each recommendation:
+    1. Reference specific user data
+    2. Estimate the potential CO2e reduction (in kg/year) if implemented
+    3. Suggest a realistic goal (e.g., "Reduce car miles by 20%")
+
+    Format as a numbered list with each recommendation containing: a) Advice, b) Data reference, c) Potential impact, d) Goal.
   `;
 
   try {
@@ -196,11 +229,10 @@ async function getAIAnalysis(
         {
           role: "system",
           content:
-            "You are a helpful assistant specializing in environmental sustainability and carbon footprint reduction.",
+            "You are a precise environmental sustainability expert. Provide concise, personalized, and actionable recommendations based on the user's specific data. Include potential impact calculations and realistic goals.",
         },
         { role: "user", content: prompt },
       ],
-      n: 1,
       temperature: 0.7,
     });
 

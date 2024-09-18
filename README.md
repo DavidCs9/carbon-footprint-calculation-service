@@ -5,15 +5,42 @@ docker run -d -p 3000:3000 \
  -e OPENAI_API_KEY= \
  public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch
 
-curl -X POST http:44.192.45.247:3000/calculate \
--H "Content-Type: application/json" \
--d '{
+curl -X POST http://localhost:3000/calculate \
+ -H "Content-Type: application/json" \
+ -d '{
 "userId": "testuser123",
 "data": {
-"electricity": 100,
-"transportation": 50,
-"diet": 75,
-"otherFactors": 25
+"housing": {
+"type": "apartment",
+"size": 2,
+"energy": {
+"electricity": 3000,
+"naturalGas": 500,
+"heatingOil": 0
+}
+},
+"transportation": {
+"car": {
+"milesDriven": 10000,
+"fuelEfficiency": 25
+},
+"publicTransit": {
+"busMiles": 1000,
+"trainMiles": 500
+},
+"flights": {
+"shortHaul": 2,
+"longHaul": 1
+}
+},
+"food": {
+"dietType": "average",
+"wasteLevel": "average"
+},
+"consumption": {
+"shoppingHabits": "average",
+"recyclingHabits": "most"
+}
 }
 }'
 
