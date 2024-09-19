@@ -3,6 +3,7 @@ docker run -d -p 3000:3000 \
  -e AWS_ACCESS_KEY_ID= \
  -e AWS_SECRET_ACCESS_KEY= \
  -e OPENAI_API_KEY= \
+ -e EMAIL_PASS= \
  public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch
 
 curl -X POST http://localhost:3000/calculate \
