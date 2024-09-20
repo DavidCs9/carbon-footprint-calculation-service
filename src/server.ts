@@ -304,7 +304,20 @@ app.post(
   }
 );
 
-const createEmailTemplate = (results: any) => {
+interface CarbonFootprintResults {
+  carbonFootprint: number;
+  housing: number;
+  transportation: number;
+  food: number;
+  consumption: number;
+}
+
+interface UserCarbonFootprint {
+  email: string;
+  results: CarbonFootprintResults;
+}
+
+const createEmailTemplate = (results: CarbonFootprintResults) => {
   const totalFootprint = results.carbonFootprint.toFixed(2);
   const housingEmissions = results.housing.toFixed(1);
   const transportationEmissions = results.transportation.toFixed(1);
@@ -473,24 +486,6 @@ const createEmailTemplate = (results: any) => {
   </div>
 </body>
 </html>`;
-};
-
-const sendResultsEmail = async (to: string, results: any) => {
-  const mailOptions = {
-    from: '"EcoViz" <noreply@ecoviz.xyz>',
-    to: to,
-    subject: "Your EcoViz Carbon Footprint Results",
-    html: createEmailTemplate(results),
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully to ${to}`);
-    return true;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return false;
-  }
 };
 
 // New endpoint for sending email results
