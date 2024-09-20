@@ -1,40 +1,12 @@
 import request from "supertest";
-import express from "express";
-import { Server } from "http";
 import {
   calculateHousingEmissions,
   calculateTransportationEmissions,
   calculateFoodEmissions,
   calculateConsumptionEmissions,
   calculateTotalCarbonFootprint,
+  app,
 } from "./server";
-
-let app: express.Application;
-let server: Server;
-
-beforeAll((done) => {
-  app = express();
-  app.use(express.json());
-
-  // Mock the main endpoint for testing
-  app.post("/calculate", (req, res) => {
-    const { userId, data } = req.body;
-    const carbonFootprint = calculateTotalCarbonFootprint(data);
-    res.status(201).json({
-      userId,
-      carbonFootprint,
-      message: "Carbon footprint calculation stored successfully",
-    });
-  });
-
-  server = app.listen(0, () => {
-    done();
-  });
-});
-
-afterAll((done) => {
-  server.close(done);
-});
 
 describe("Carbon Footprint Calculation Functions", () => {
   test("calculateHousingEmissions", () => {
@@ -129,6 +101,9 @@ describe("Carbon Footprint Calculation Functions", () => {
 
 describe("API Endpoints", () => {
   test("POST /calculate", async () => {
+    // Increase timeout to 60 seconds
+    jest.setTimeout(60000);
+
     const response = await request(app)
       .post("/calculate")
       .send({
@@ -174,7 +149,7 @@ describe("API Endpoints", () => {
     expect(response.body.carbonFootprint).toBeCloseTo(15941.75, 0);
     expect(response.body).toHaveProperty(
       "message",
-      "Carbon footprint calculation stored successfully"
+      "Carbon footprint calculation and AI analysis stored successfully"
     );
-  });
+  }, 60000); // Add timeout here as well
 });

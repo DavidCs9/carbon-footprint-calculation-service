@@ -10,7 +10,9 @@ import { body, validationResult } from "express-validator";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
+app.use(bodyParser.json());
+app.use(cors());
 const port = process.env.PORT || 3000;
 const transporter = nodemailer.createTransport({
   host: "smtp.zoho.com",
@@ -533,8 +535,16 @@ export {
   calculateTotalCarbonFootprint,
 };
 
-app.listen(port, () => {
-  console.log(
-    `Carbon Footprint Calculation Service listening at http://localhost:${port}`
-  );
-});
+// Move the server start logic into a separate function
+export const startServer = () => {
+  app.listen(port, () => {
+    console.log(
+      `Carbon Footprint Calculation Service listening at http://localhost:${port}`
+    );
+  });
+};
+
+// Only start the server if this file is run directly
+if (require.main === module) {
+  startServer();
+}
