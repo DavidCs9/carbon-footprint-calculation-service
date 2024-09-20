@@ -1,5 +1,6 @@
 import request from "supertest";
 import express from "express";
+import { Server } from "http";
 import {
   calculateHousingEmissions,
   calculateTransportationEmissions,
@@ -8,18 +9,31 @@ import {
   calculateTotalCarbonFootprint,
 } from "./server";
 
-const app = express();
-app.use(express.json());
+let app: express.Application;
+let server: Server;
 
-// Mock the main endpoint for testing
-app.post("/calculate", (req, res) => {
-  const { userId, data } = req.body;
-  const carbonFootprint = calculateTotalCarbonFootprint(data);
-  res.status(201).json({
-    userId,
-    carbonFootprint,
-    message: "Carbon footprint calculation stored successfully",
+beforeAll((done) => {
+  app = express();
+  app.use(express.json());
+
+  // Mock the main endpoint for testing
+  app.post("/calculate", (req, res) => {
+    const { userId, data } = req.body;
+    const carbonFootprint = calculateTotalCarbonFootprint(data);
+    res.status(201).json({
+      userId,
+      carbonFootprint,
+      message: "Carbon footprint calculation stored successfully",
+    });
   });
+
+  server = app.listen(0, () => {
+    done();
+  });
+});
+
+afterAll((done) => {
+  server.close(done);
 });
 
 describe("Carbon Footprint Calculation Functions", () => {
@@ -34,7 +48,7 @@ describe("Carbon Footprint Calculation Functions", () => {
       },
     };
     const emissions = calculateHousingEmissions(housingData);
-    expect(emissions).toBeCloseTo(4085, 0); // 1000 * 0.42 + 500 * 5.3 + 100 * 10.15
+    expect(emissions).toBeCloseTo(4085, 0);
   });
 
   test("calculateTransportationEmissions", () => {
@@ -53,7 +67,7 @@ describe("Carbon Footprint Calculation Functions", () => {
       },
     };
     const emissions = calculateTransportationEmissions(transportationData);
-    expect(emissions).toBeCloseTo(10235.5, 0); // (10000 / 25) * 8.89 + 1000 * 0.059 + 500 * 0.041 + 2 * 1100 + 1 * 4400
+    expect(emissions).toBeCloseTo(10235.5, 0);
   });
 
   test("calculateFoodEmissions", () => {
@@ -62,7 +76,7 @@ describe("Carbon Footprint Calculation Functions", () => {
       wasteLevel: "low",
     };
     const emissions = calculateFoodEmissions(foodData);
-    expect(emissions).toBeCloseTo(821.25, 0); // 365 * 2.5 * 0.9
+    expect(emissions).toBeCloseTo(821.25, 0);
   });
 
   test("calculateConsumptionEmissions", () => {
@@ -71,7 +85,7 @@ describe("Carbon Footprint Calculation Functions", () => {
       recyclingHabits: "most",
     };
     const emissions = calculateConsumptionEmissions(consumptionData);
-    expect(emissions).toBe(800); // 1000 * 1.0 * 0.8
+    expect(emissions).toBe(800);
   });
 
   test("calculateTotalCarbonFootprint", () => {
@@ -109,7 +123,7 @@ describe("Carbon Footprint Calculation Functions", () => {
       },
     };
     const totalEmissions = calculateTotalCarbonFootprint(data);
-    expect(totalEmissions).toBeCloseTo(15941.75, 0); // Sum of all individual calculations
+    expect(totalEmissions).toBeCloseTo(15941.75, 0);
   });
 });
 
