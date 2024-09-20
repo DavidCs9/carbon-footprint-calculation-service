@@ -525,6 +525,14 @@ app.post(
   }
 );
 
+export {
+  calculateHousingEmissions,
+  calculateTransportationEmissions,
+  calculateFoodEmissions,
+  calculateConsumptionEmissions,
+  calculateTotalCarbonFootprint,
+};
+
 app.listen(port, () => {
   console.log(
     `Carbon Footprint Calculation Service listening at http://localhost:${port}`
