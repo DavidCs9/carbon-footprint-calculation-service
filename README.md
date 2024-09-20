@@ -219,4 +219,4 @@ For any queries or support, please contact us at support@ecoviz.xyz.
 
 ---
 
-Built with 💻 by the EcoViz Team
+Built with 💻 by the EcoViz Team.
