@@ -20,6 +20,12 @@ jobs:
       run: npm install
     
     - name: Run tests
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-east-1'
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
       run: npm test
     
     - name: Configure AWS credentials
