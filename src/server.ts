@@ -527,6 +527,10 @@ app.post(
   }
 );
 
+app.get("/", (req: Request, res: Response) => {
+  res.json({ message: "Welcome to the EcoViz API" });
+});
+
 export {
   calculateHousingEmissions,
   calculateTransportationEmissions,
