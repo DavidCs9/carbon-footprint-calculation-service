@@ -61,8 +61,8 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ${USER}@${HOST} '
-          docker pull public.ecr.aws/b2v6g4u0/carbon-footprint-service:latest &&
+          docker pull public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch &&
           docker stop $(docker ps -q --filter ancestor=public.ecr.aws/b2v6g4u0/carbon-footprint-service) || true &&
-          docker run -d --restart unless-stopped public.ecr.aws/b2v6g4u0/carbon-footprint-service:latest
+          docker run -d --restart unless-stopped public.ecr.aws/b2v6g4u0/carbon-footprint-service:multi-arch
         '
         rm -f private_key
